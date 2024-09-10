@@ -7,14 +7,12 @@ In a mobile application, a stack is an ideal data structure to handle undo opera
 
 Here's how you can implement undo operations using a stack in JavaScript:
 
-Steps to Implement Undo with a Stack:
+##### Steps to Implement Undo with a Stack:
 Initialize a Stack: Create a stack that stores actions performed by the user. Each action can be represented as an object containing the action type and any necessary state (e.g., what was changed, previous values).
 
-Push Actions to the Stack: Each time the user performs an action, push the action details onto the stack. This saves the current state, which will allow you to revert it later.
-
-Undo Action: When the user requests to undo an action, pop the most recent action from the stack and use its details to reverse the change.
-
-Redo (Optional): If you want to implement redo, you can maintain another stack for storing undone actions, allowing the user to redo them if needed.
+1. Push Actions to the Stack: Each time the user performs an action, push the action details onto the stack. This saves the current state, which will allow you to revert it later.
+2. Undo Action: When the user requests to undo an action, pop the most recent action from the stack and use its details to reverse the change.
+3. Redo (Optional): If you want to implement redo, you can maintain another stack for storing undone actions, allowing the user to redo them if needed.
 
 ```js
 class UndoManager {
