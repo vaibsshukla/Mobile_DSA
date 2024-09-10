@@ -92,10 +92,10 @@ undoManager.undo(); // Removes 'Item1'
 undoManager.redo(); // Adds 'Item1' back
 
 ```
-Explanation:
-PerformAction: Adds an action to the undo stack.
-Undo: Pops the last action from the undo stack, reverses it, and optionally pushes it to the redo stack.
-Redo (optional): Reapplies an undone action and moves it back to the undo stack.
-You can adapt this approach to fit the specific operations and state management needs of your mobile app.
+#### Explanation:
+1. PerformAction: Adds an action to the undo stack.
+2. Undo: Pops the last action from the undo stack, reverses it, and optionally pushes it to the redo stack.
+3. Redo (optional): Reapplies an undone action and moves it back to the undo stack.
+4. You can adapt this approach to fit the specific operations and state management needs of your mobile app.
 
 
