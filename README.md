@@ -98,4 +98,5 @@ undoManager.redo(); // Adds 'Item1' back
 3. Redo (optional): Reapplies an undone action and moves it back to the undo stack.
 4. You can adapt this approach to fit the specific operations and state management needs of your mobile app.
 
+---
 
