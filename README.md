@@ -1,7 +1,7 @@
 # Mobile_DSA
 
 
-#### How can you use a stack to handle undo operations in a mobile application?
+### How can you use a stack to handle undo operations in a mobile application?
 
 In a mobile application, a stack is an ideal data structure to handle undo operations. A stack operates on the principle of Last In, First Out (LIFO), which makes it well-suited for undo functionalities, where the last action performed should be the first one to be undone.
 
