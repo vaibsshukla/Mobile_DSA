@@ -1005,6 +1005,291 @@ Store C: 5 units away
 Cafe D: 3 units away
 
 ---
+### 7. How would you use a circular buffer to manage a fixed-size cache in a mobile app?
+
+
+A circular buffer (also known as a ring buffer) is a data structure that provides an efficient way to manage a fixed-size collection of data. It operates in a way that when it reaches the end of the buffer, it wraps around to the beginning. This makes it ideal for managing a fixed-size cache in a mobile app, where you want to store a limited number of items (e.g., network responses, images, or recently used data) and automatically overwrite the oldest data when the buffer is full.
+
+Here’s how you could use a circular buffer to manage a fixed-size cache in a mobile app:
+
+Key Features of Circular Buffer for Cache Management
+Fixed-Size: The buffer has a predefined size, which limits the number of cache items it can hold.
+Efficient Overwriting: When the buffer is full, adding new items overwrites the oldest data, ensuring that the cache always contains the most recent data.
+Constant Time Operations: Inserting new items and removing old ones are constant-time operations, making the circular buffer efficient for mobile apps where performance is critical.
+Step-by-Step Approach
+Initialize the Circular Buffer: Set up the circular buffer with a fixed size. The buffer has a start (head) and an end (tail) pointer, and items are added at the tail.
+Adding an Item: When a new item is added, it’s inserted at the position of the tail pointer. If the buffer is full, the oldest item (at the head) is overwritten.
+Reading Items: Items can be read from any position in the buffer by indexing between the head and tail pointers.
+Overwriting Old Items: If the buffer is full, when a new item is added, the head pointer is incremented (pointing to the oldest item that is being replaced).
+Handling Cache Misses: When a requested item is not found in the cache, a cache miss occurs, and the item is fetched (e.g., from the network or disk) and added to the buffer.
+Example Implementation in JavaScript
+Here’s a simple implementation of a circular buffer to manage a fixed-size cache:
+
+```js
+class CircularBuffer {
+  constructor(size) {
+    this.size = size;   // Fixed size of the buffer
+    this.buffer = new Array(size); // The buffer array
+    this.head = 0;      // Points to the oldest element
+    this.tail = 0;      // Points to the next insertion point
+    this.isFull = false;  // Tracks if the buffer is full
+  }
+
+  // Add a new item to the buffer
+  add(item) {
+    this.buffer[this.tail] = item;
+    
+    if (this.isFull) {
+      this.head = (this.head + 1) % this.size; // Overwrite oldest item
+    }
+    
+    this.tail = (this.tail + 1) % this.size;
+    if (this.tail === this.head) {
+      this.isFull = true; // Buffer is full when tail catches head
+    }
+  }
+
+  // Get an item from the buffer by index
+  get(index) {
+    if (index >= this.size || (this.tail === this.head && !this.isFull)) {
+      return null;  // Out of bounds or empty buffer
+    }
+    return this.buffer[(this.head + index) % this.size];
+  }
+
+  // Check if the buffer contains an item (for cache hit/miss)
+  contains(item) {
+    return this.buffer.includes(item);
+  }
+
+  // Get all elements in the buffer in order
+  getAll() {
+    let elements = [];
+    for (let i = 0; i < this.size; i++) {
+      let item = this.get(i);
+      if (item !== null) {
+        elements.push(item);
+      }
+    }
+    return elements;
+  }
+}
+
+// Example Usage:
+
+const cache = new CircularBuffer(3);  // Create a buffer with size 3
+
+// Add items to the cache
+cache.add("Page 1");
+cache.add("Page 2");
+cache.add("Page 3");
+
+console.log("Cache after adding 3 pages:", cache.getAll());
+
+// Cache is full; next addition will overwrite "Page 1"
+cache.add("Page 4");
+
+console.log("Cache after adding Page 4 (Page 1 overwritten):", cache.getAll());
+
+// Check if an item is in the cache
+console.log("Cache contains 'Page 2'?", cache.contains("Page 2"));  // True
+console.log("Cache contains 'Page 1'?", cache.contains("Page 1"));  // False
+
+// Add another item, overwriting "Page 2"
+cache.add("Page 5");
+
+console.log("Cache after adding Page 5 (Page 2 overwritten):", cache.getAll());
+
+```
+
+Explanation of the Code:
+Circular Buffer Class:
+
+The CircularBuffer class has a fixed size (e.g., 3 items in this case).
+The add() method adds new items to the cache. When the buffer is full, it overwrites the oldest item.
+The get() method retrieves an item from the buffer by its index relative to the head.
+The contains() method checks if a given item is present in the cache (to handle cache hits and misses).
+The getAll() method returns all the items in the cache for inspection.
+Buffer Wrapping:
+
+When the tail pointer reaches the end of the array, it wraps around to the beginning using the modulus operator (%).
+Similarly, when the head pointer advances due to overwriting old data, it also wraps around the buffer.
+Overwriting Logic:
+
+If the buffer is full (isFull flag is set to true), the add() method advances the head pointer to overwrite the oldest element.
+Example Scenario:
+Let’s walk through how the cache works in the above example:
+
+Initially, the cache holds three items: Page 1, Page 2, and Page 3.
+When Page 4 is added, the oldest item (Page 1) is overwritten, as the buffer only holds three items.
+If we keep adding new items (e.g., Page 5), the cache keeps overwriting the oldest items, ensuring the cache always contains the most recent data.
+Benefits of Using a Circular Buffer for Cache Management:
+Efficient Memory Usage: The fixed size ensures that the app only uses a set amount of memory, avoiding uncontrolled memory growth.
+
+Automatic Cache Eviction: The buffer automatically overwrites the oldest items, implementing a First-In-First-Out (FIFO) eviction policy.
+
+Constant-Time Operations: Both adding new items and removing old ones are constant-time operations (O(1)), which is crucial for mobile app performance.
+
+Improved Performance: Circular buffers are particularly efficient in scenarios where old data naturally expires and new data continuously replaces it, such as caching images, network responses, or recent search queries in a mobile app.
+
+Conclusion:
+A circular buffer is an ideal structure for managing a fixed-size cache in a mobile app. It allows for efficient, constant-time addition and eviction of cache entries and ensures that the most recent data is always available. This is particularly useful for handling frequently accessed, limited-size data like API responses, images, or recent user actions in mobile applications.
+
+---
+
+### 8. How can you implement an LRU (Least Recently Used) cache to manage limited memory resources in mobile app ? javascript
+
+An LRU (Least Recently Used) cache is a data structure that stores a limited number of items and ensures that the least recently accessed item is removed when the cache reaches its capacity. This is especially useful in mobile apps where memory resources are constrained, and frequently used items need to be quickly accessible.
+
+Key Features of LRU Cache:
+Limited Size: The cache has a maximum capacity, and once this limit is reached, the least recently used item is removed.
+Efficient Access: Both read and write operations (get and put) should be efficient.
+Fast Removal: When the cache is full, the least recently used item should be removed in constant time.
+To implement an LRU Cache in JavaScript, we can use a combination of a Hash Map (for quick lookups) and a Doubly Linked List (for efficiently managing the order of recently used items). The doubly linked list keeps track of the most and least recently used items, allowing constant time addition, removal, and access.
+
+Step-by-Step Approach:
+Hash Map: This will store key-value pairs where the key is the cache key, and the value is a reference to a node in the doubly linked list.
+Doubly Linked List: This will maintain the order of items from most recently used (head) to least recently used (tail). When a new item is accessed, it's moved to the head. When the cache is full, the item at the tail is removed.
+Operations:
+get(key): If the key exists, move the corresponding node to the front of the list (most recently used) and return its value. If the key does not exist, return null.
+put(key, value): Add a new key-value pair to the cache. If the cache is full, remove the least recently used item (from the tail of the list). If the key already exists, update its value and move it to the front.
+LRU Cache Implementation in JavaScript
+
+```js
+class Node {
+  constructor(key, value) {
+    this.key = key;
+    this.value = value;
+    this.prev = null;
+    this.next = null;
+  }
+}
+
+class LRUCache {
+  constructor(capacity) {
+    this.capacity = capacity;      // Maximum size of the cache
+    this.cache = new Map();        // Hash map for O(1) access to nodes
+    this.head = new Node(null, null);  // Dummy head
+    this.tail = new Node(null, null);  // Dummy tail
+    this.head.next = this.tail;        // Initialize the doubly linked list
+    this.tail.prev = this.head;
+  }
+
+  // Helper function to remove a node from the doubly linked list
+  removeNode(node) {
+    let prevNode = node.prev;
+    let nextNode = node.next;
+    prevNode.next = nextNode;
+    nextNode.prev = prevNode;
+  }
+
+  // Helper function to add a node to the front (right after head) of the doubly linked list
+  addToFront(node) {
+    let firstNode = this.head.next;
+    this.head.next = node;
+    node.prev = this.head;
+    node.next = firstNode;
+    firstNode.prev = node;
+  }
+
+  // Move a node to the front of the list (most recently used)
+  moveToFront(node) {
+    this.removeNode(node);
+    this.addToFront(node);
+  }
+
+  // Get a value by key from the cache
+  get(key) {
+    if (this.cache.has(key)) {
+      let node = this.cache.get(key);
+      this.moveToFront(node);   // Move accessed node to the front (most recently used)
+      return node.value;
+    }
+    return null;  // Key not found
+  }
+
+  // Put a key-value pair into the cache
+  put(key, value) {
+    if (this.cache.has(key)) {
+      // Update the value of an existing key and move it to the front
+      let node = this.cache.get(key);
+      node.value = value;
+      this.moveToFront(node);
+    } else {
+      // Add a new key-value pair to the cache
+      let newNode = new Node(key, value);
+      this.cache.set(key, newNode);
+      this.addToFront(newNode);
+      
+      if (this.cache.size > this.capacity) {
+        // Cache is full, remove the least recently used item (from the tail)
+        let lruNode = this.tail.prev;
+        this.removeNode(lruNode);
+        this.cache.delete(lruNode.key);  // Remove from the hash map
+      }
+    }
+  }
+}
+
+// Example usage:
+
+let lruCache = new LRUCache(3);
+
+// Adding items to the cache
+lruCache.put(1, 'Page 1');
+lruCache.put(2, 'Page 2');
+lruCache.put(3, 'Page 3');
+console.log("Cache after adding 3 pages:", Array.from(lruCache.cache.keys()));
+
+// Accessing an item updates its usage order (most recently used)
+lruCache.get(1);  // Access 'Page 1'
+console.log("Cache after accessing Page 1:", Array.from(lruCache.cache.keys()));
+
+// Adding a new item when cache is full (Page 2 will be removed as it is least recently used)
+lruCache.put(4, 'Page 4');
+console.log("Cache after adding Page 4:", Array.from(lruCache.cache.keys()));
+
+// Accessing another item
+lruCache.get(3);  // Access 'Page 3'
+console.log("Cache after accessing Page 3:", Array.from(lruCache.cache.keys()));
+
+// Adding another new item (Page 1 will be removed as it is least recently used now)
+lruCache.put(5, 'Page 5');
+console.log("Cache after adding Page 5:", Array.from(lruCache.cache.keys()));
+
+```
+
+Explanation of the Code:
+Node Class:
+
+The Node class represents each item in the doubly linked list. Each node has a key, value, and pointers to the previous and next nodes.
+LRUCache Class:
+
+Constructor: Takes a capacity as input, which is the maximum number of items the cache can hold. It initializes a hash map (cache) for fast access and a doubly linked list to manage the order of items.
+addToFront(node): Adds a new node to the front of the doubly linked list, making it the most recently used.
+removeNode(node): Removes a node from the doubly linked list.
+moveToFront(node): Moves a node to the front of the list, marking it as the most recently used.
+get(key): If the key exists in the cache, the corresponding node is moved to the front of the list and its value is returned. If the key does not exist, null is returned.
+put(key, value): Adds a new key-value pair to the cache. If the cache is full, the least recently used item (the one at the end of the list) is removed. If the key already exists, its value is updated, and it is moved to the front of the list.
+Example Scenario:
+Let’s walk through how the cache works with the following operations:
+
+We initialize the cache with a capacity of 3.
+We add three items to the cache (Page 1, Page 2, Page 3).
+When we access Page 1, it becomes the most recently used, and its position in the cache is updated.
+When we add Page 4, Page 2 is removed because it’s the least recently used.
+The same process continues as we access and add more items, maintaining the most recently used items in the cache.
+Benefits of Using LRU Cache in Mobile Apps:
+Efficient Memory Management: The cache automatically removes the least recently used items, keeping memory usage within limits.
+
+Fast Access: Both get and put operations are efficient (average O(1) time complexity), which ensures that the app performs well, even with limited resources.
+
+Optimized for Frequent Access Patterns: The cache is particularly useful in scenarios where some items are accessed repeatedly, such as images, API responses, or recently used data.
+
+Conclusion:
+An LRU cache is an essential data structure for managing limited memory resources in mobile apps. By combining a hash map for fast lookups and a doubly linked list for efficient management of usage order, you can ensure that your cache stores the most recently used items while efficiently removing the least recently used ones when memory is constrained.
+
+---
 
 
 
