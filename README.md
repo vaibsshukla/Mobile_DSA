@@ -214,6 +214,123 @@ processMessage: Enqueues tasks associated with a single message.
 Using a queue in this way ensures that each message is processed in the correct order and that the tasks associated with each message are handled sequentially, preventing potential issues with race conditions or resource conflicts.
 
 
+### 3. How would you implement a priority queue for managing notifications or tasks based on priority in a mobile app ?
+
+A Priority Queue is a useful data structure for managing tasks or notifications in a mobile app based on their priority. In a priority queue, each task is associated with a priority, and tasks with higher priority are processed before those with lower priority.
+
+Use Case Scenario: Notification System in a Mobile App
+Imagine a mobile app where notifications have different levels of importance:
+
+Critical notifications (e.g., system alerts, urgent messages) should be displayed immediately.
+Medium priority notifications (e.g., social updates) can be displayed after critical notifications.
+Low priority notifications (e.g., promotional messages) can be delayed until higher-priority notifications are handled.
+A priority queue would ensure that higher-priority notifications are always handled first, even if lower-priority ones are added earlier.
+
+Steps to Implement a Priority Queue in JavaScript
+Define the Priority Queue Class: Create a class that manages a queue of tasks or notifications. Each entry will have a priority associated with it.
+
+Enqueue: When a new task or notification is added, it should be placed in the queue according to its priority.
+
+Dequeue: The highest-priority task should be processed first.
+
+Sort by Priority: The queue should maintain its order, ensuring the highest-priority task is always at the front.
+
+```js
+class PriorityQueue {
+  constructor() {
+    this.queue = [];
+  }
+
+  // Add an item with a given priority to the queue
+  enqueue(item, priority) {
+    const task = { item, priority };
+
+    // Find the correct position to insert the task based on priority
+    let added = false;
+    for (let i = 0; i < this.queue.length; i++) {
+      if (this.queue[i].priority < task.priority) {
+        this.queue.splice(i, 0, task);
+        added = true;
+        break;
+      }
+    }
+
+    // If not added yet, append it to the end of the queue
+    if (!added) {
+      this.queue.push(task);
+    }
+  }
+
+  // Remove and return the highest-priority item from the queue
+  dequeue() {
+    if (this.queue.length === 0) {
+      return "Queue is empty";
+    }
+    return this.queue.shift().item;
+  }
+
+  // View the highest-priority item without removing it
+  peek() {
+    if (this.queue.length === 0) {
+      return "Queue is empty";
+    }
+    return this.queue[0].item;
+  }
+
+  // Check if the queue is empty
+  isEmpty() {
+    return this.queue.length === 0;
+  }
+}
+
+// Example usage:
+const notificationQueue = new PriorityQueue();
+
+// Add notifications with different priorities
+notificationQueue.enqueue('Low-priority notification', 1);
+notificationQueue.enqueue('Critical system alert', 5);
+notificationQueue.enqueue('Social update', 3);
+
+// Process notifications based on priority
+console.log(notificationQueue.dequeue()); // "Critical system alert"
+console.log(notificationQueue.dequeue()); // "Social update"
+console.log(notificationQueue.dequeue()); // "Low-priority notification"
+
+```
+
+Explanation:
+enqueue(item, priority):
+
+Takes an item (e.g., a notification or task) and a priority value (higher values indicate higher priority).
+It inserts the item at the correct position in the queue based on its priority, ensuring that higher-priority items come before lower-priority ones.
+dequeue():
+
+Removes and returns the highest-priority item (the first item in the queue).
+If the queue is empty, it returns a message indicating that.
+peek():
+
+Returns the highest-priority item without removing it from the queue.
+isEmpty():
+
+Checks whether the queue is empty.
+How It Works in the Mobile App:
+In a notification system, notifications would be added to the priority queue based on their urgency:
+
+Critical system alerts would have the highest priority and would be displayed first.
+Social updates would have a medium priority.
+Promotional messages would have the lowest priority and would only be shown after more important notifications have been handled.
+The app would use enqueue() to add notifications to the queue, and dequeue() to process them in order of priority, ensuring the most important notifications are always displayed first.
+
+Customization Options:
+Dynamic Priorities: You can dynamically adjust the priority based on user interaction or app context. For example, if the app is in the foreground, certain notifications might become more important.
+
+Task Timeouts: You can add a timeout mechanism that processes lower-priority tasks after a certain amount of time, even if higher-priority tasks are pending.
+
+Thresholds: Implement thresholds for priority levels where, for example, tasks below a certain priority level are ignored if higher-priority tasks arrive within a given time frame.
+
+Conclusion:
+A priority queue in a mobile app allows you to manage tasks like notifications effectively, ensuring that important tasks are handled first. By using the enqueue() method to add tasks in order of priority and dequeue() to handle them, you can manage tasks or notifications in a responsive and efficient manner.
+
 
 
 
