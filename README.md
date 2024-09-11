@@ -478,6 +478,535 @@ Predictive Text: Combine a Trie with machine learning or statistical models to i
 Conclusion:
 A Trie is a powerful data structure for implementing efficient autocomplete functionality in a mobile app. It allows you to quickly find all words that match a given prefix and scale the autocomplete feature for large datasets, providing a responsive and user-friendly experience.
 
+---
+
+### 5. How would you use a BST to efficiently search and manage a list of items in a mobile app?
+
+A Binary Search Tree (BST) is a tree data structure where each node has at most two children, referred to as the left and right child. In a BST, the left child contains nodes with values less than the parent, and the right child contains nodes with values greater than the parent. This structure enables efficient searching, insertion, and deletion operations, making it useful for managing and searching lists of items in a mobile app.
+
+Use Case Scenario: Managing and Searching a Sorted List of Items
+Let’s assume you have a mobile app that displays a list of items (such as products, contacts, or files) that can be searched, added, or removed efficiently. You want to support fast searches, inserts, and deletes, and keep the items sorted for quick display. A Binary Search Tree (BST) would be a great data structure to manage this list.
+
+Why Use a BST?
+Efficient Search: A balanced BST allows you to search for items in O(log N) time, making it faster than linear search (O(N)) in an unsorted list.
+Dynamic Insertion/Deletion: A BST allows for dynamic insertion and deletion of items while maintaining the sorted order, without needing to re-sort the list like in an array.
+In-order Traversal: The in-order traversal of a BST gives you the items in a sorted order, perfect for displaying sorted lists.
+Operations in a BST
+Search: Given a key (item), you can efficiently locate it by recursively comparing it to the root node and moving left or right until you find the item or reach a leaf node.
+Insert: When inserting a new item, compare it with the root node, then recursively move left or right to find the correct position to maintain the BST properties.
+Delete: Deleting an item involves finding the node and removing it while ensuring that the BST properties are maintained.
+In-order Traversal: Traverse the tree in sorted order by recursively visiting the left subtree, the current node, and then the right subtree.
+
+Implementing a BST in JavaScript
+
+```js
+class Node {
+  constructor(key, value) {
+    this.key = key;    // The item’s key (e.g., product ID, name)
+    this.value = value; // The item’s data (e.g., product details)
+    this.left = null;   // Left child node
+    this.right = null;  // Right child node
+  }
+}
+
+class BST {
+  constructor() {
+    this.root = null;
+  }
+
+  // Insert a new item into the BST
+  insert(key, value) {
+    const newNode = new Node(key, value);
+    if (!this.root) {
+      this.root = newNode;
+    } else {
+      this.insertNode(this.root, newNode);
+    }
+  }
+
+  insertNode(node, newNode) {
+    if (newNode.key < node.key) {
+      // Go to the left
+      if (!node.left) {
+        node.left = newNode;
+      } else {
+        this.insertNode(node.left, newNode);
+      }
+    } else {
+      // Go to the right
+      if (!node.right) {
+        node.right = newNode;
+      } else {
+        this.insertNode(node.right, newNode);
+      }
+    }
+  }
+
+  // Search for an item by key
+  search(key) {
+    return this.searchNode(this.root, key);
+  }
+
+  searchNode(node, key) {
+    if (!node) {
+      return null;  // Key not found
+    }
+    if (key < node.key) {
+      return this.searchNode(node.left, key);  // Go to the left
+    } else if (key > node.key) {
+      return this.searchNode(node.right, key); // Go to the right
+    } else {
+      return node.value;  // Key found
+    }
+  }
+
+  // Remove an item by key
+  remove(key) {
+    this.root = this.removeNode(this.root, key);
+  }
+
+  removeNode(node, key) {
+    if (!node) {
+      return null;
+    }
+    if (key < node.key) {
+      node.left = this.removeNode(node.left, key);
+      return node;
+    } else if (key > node.key) {
+      node.right = this.removeNode(node.right, key);
+      return node;
+    } else {
+      // Node to be deleted found
+      // Case 1: No child
+      if (!node.left && !node.right) {
+        return null;
+      }
+      // Case 2: One child
+      if (!node.left) {
+        return node.right;
+      }
+      if (!node.right) {
+        return node.left;
+      }
+      // Case 3: Two children
+      const minRightNode = this.findMinNode(node.right);
+      node.key = minRightNode.key;
+      node.value = minRightNode.value;
+      node.right = this.removeNode(node.right, minRightNode.key);
+      return node;
+    }
+  }
+
+  // Find the minimum node in the tree (used for deletion)
+  findMinNode(node) {
+    while (node && node.left) {
+      node = node.left;
+    }
+    return node;
+  }
+
+  // In-order traversal (sorted order)
+  inOrderTraverse(node = this.root, callback) {
+    if (node !== null) {
+      this.inOrderTraverse(node.left, callback);
+      callback(node.key, node.value);
+      this.inOrderTraverse(node.right, callback);
+    }
+  }
+}
+
+// Example usage:
+const bst = new BST();
+
+// Insert some items (e.g., product ID and product name)
+bst.insert(10, "Product A");
+bst.insert(20, "Product B");
+bst.insert(5, "Product C");
+bst.insert(15, "Product D");
+
+// Search for an item
+const searchResult = bst.search(10);
+console.log(`Found: ${searchResult}`); // Found: Product A
+
+// Remove an item
+bst.remove(5);
+
+// Traverse the BST in sorted order
+console.log("Items in sorted order:");
+bst.inOrderTraverse(bst.root, (key, value) => {
+  console.log(`${key}: ${value}`);
+});
+// Output:
+// 10: Product A
+// 15: Product D
+// 20: Product B
+
+```
+
+Explanation of the Code:
+Node Class: Each node stores a key (such as an item ID or name) and a value (such as item details). It also has left and right child references.
+BST Class:
+insert(): Adds a new item into the tree at the appropriate position to maintain the BST property.
+search(): Recursively searches the tree for a specific item by its key.
+remove(): Deletes an item by key and restructures the tree to maintain the BST property.
+inOrderTraverse(): Traverses the tree in sorted order (left to right), allowing the items to be displayed in a sorted list.
+Benefits of Using a BST for Managing Items:
+Efficient Search: Searching for an item in a balanced BST takes O(log N) time, making it faster than a linear search through a list or array.
+
+Maintained Sorted Order: An in-order traversal of the BST yields the items in sorted order, which is useful when displaying sorted lists in the app.
+
+Dynamic Inserts and Deletes: Items can be inserted or deleted from the BST while maintaining the sorted order. This is ideal for apps where the list of items is frequently updated.
+
+Scalability: BSTs work well for managing large lists of items. As long as the tree remains balanced (or you use a balanced variant like AVL or Red-Black Tree), it handles operations efficiently as the number of items grows.
+
+Optimizations for a Mobile App:
+Balanced BSTs: Use a self-balancing BST (e.g., AVL tree or Red-Black tree) to ensure that the tree remains balanced, guaranteeing O(log N) performance for search, insertion, and deletion.
+
+Memory Considerations: Mobile apps have limited resources, so the memory overhead of managing pointers and recursive operations needs to be considered. Balanced trees are slightly more complex but ensure better performance in the long run.
+
+Conclusion:
+Using a Binary Search Tree (BST) in a mobile app allows for efficient management of dynamically changing lists of items. It supports fast search, insert, and delete operations while maintaining sorted order, making it an excellent choice for features like contact lists, product catalogs, or file management systems in mobile applications.
+
+### 6. How can a heap be used to efficiently implement a priority-based task scheduler in a mobile app?
+
+A heap is an ideal data structure to implement a priority-based task scheduler in a mobile app due to its efficiency in managing dynamic priority queues. The most common type of heap used for this purpose is the binary heap, either a min-heap or a max-heap, depending on whether higher or lower priority values take precedence.
+
+Key Characteristics of a Heap:
+A min-heap is a complete binary tree where the parent node has a value smaller than or equal to its children. The smallest value is always at the root.
+A max-heap is similar, except that the parent node has a value larger than or equal to its children. The largest value is at the root.
+Heaps allow for efficient insertion and removal of elements based on priority, with both operations typically taking O(log N) time.
+Scenario: Priority-Based Task Scheduler in a Mobile App
+Imagine you're building a task scheduler for a mobile app (e.g., a background task manager, a download manager, or a system that handles notifications). Tasks need to be executed based on their priority rather than the order they were added.
+
+Higher priority tasks should be executed before lower priority tasks.
+New tasks can arrive dynamically and must be inserted into the schedule in the correct position based on their priority.
+Tasks can also be completed or canceled, and the schedule needs to be updated efficiently.
+Why Use a Heap for Task Scheduling?
+Efficient Priority Management: A heap ensures that the highest or lowest priority task is always at the root, allowing for O(1) access to the next task to be executed.
+Efficient Insertion and Deletion: Inserting and deleting tasks in a heap takes O(log N) time, making it suitable for dynamically changing lists of tasks where priorities can vary.
+Space Efficiency: A heap stores tasks in a compact way using an array or tree, which is efficient in terms of memory use, important for mobile applications with limited resources.
+Steps to Implement a Priority-Based Task Scheduler with a Heap:
+Task Representation: Each task has a priority and the task details. For example, the priority could be an integer, where lower values represent higher priority (in the case of a min-heap).
+
+Insert Task: Add a new task to the heap, maintaining the heap property (i.e., the root is the highest or lowest priority task, depending on the heap type).
+
+Pop Highest-Priority Task: Remove and return the root element, which is the highest-priority task, and restructure the heap to maintain its properties.
+
+Task Execution: The scheduler executes the task with the highest priority and then pops the next task.
+
+Example: Implementing a Task Scheduler Using a Min-Heap in JavaScript
+
+```js
+class MinHeap {
+  constructor() {
+    this.heap = [];
+  }
+
+  // Get the index of the parent, left child, and right child
+  getParentIndex(i) { return Math.floor((i - 1) / 2); }
+  getLeftChildIndex(i) { return 2 * i + 1; }
+  getRightChildIndex(i) { return 2 * i + 2; }
+
+  // Swap two elements in the heap
+  swap(i, j) {
+    [this.heap[i], this.heap[j]] = [this.heap[j], this.heap[i]];
+  }
+
+  // Insert a task into the heap
+  insert(task) {
+    this.heap.push(task);
+    this.heapifyUp(this.heap.length - 1);  // Fix the heap property
+  }
+
+  // Maintain the heap property after insertion
+  heapifyUp(index) {
+    let currentIndex = index;
+    let parentIndex = this.getParentIndex(currentIndex);
+    
+    // While the inserted task has higher priority (smaller value), move it up
+    while (currentIndex > 0 && this.heap[currentIndex].priority < this.heap[parentIndex].priority) {
+      this.swap(currentIndex, parentIndex);
+      currentIndex = parentIndex;
+      parentIndex = this.getParentIndex(currentIndex);
+    }
+  }
+
+  // Remove the highest priority task (root)
+  pop() {
+    if (this.heap.length === 0) return null;
+    
+    const task = this.heap[0];
+    const lastTask = this.heap.pop();
+    
+    if (this.heap.length > 0) {
+      this.heap[0] = lastTask;
+      this.heapifyDown(0);  // Fix the heap property
+    }
+    
+    return task;
+  }
+
+  // Maintain the heap property after removal
+  heapifyDown(index) {
+    let currentIndex = index;
+    const length = this.heap.length;
+    
+    while (true) {
+      const leftChildIndex = this.getLeftChildIndex(currentIndex);
+      const rightChildIndex = this.getRightChildIndex(currentIndex);
+      let smallestIndex = currentIndex;
+
+      // Find the smallest of current, left, and right child
+      if (leftChildIndex < length && this.heap[leftChildIndex].priority < this.heap[smallestIndex].priority) {
+        smallestIndex = leftChildIndex;
+      }
+      if (rightChildIndex < length && this.heap[rightChildIndex].priority < this.heap[smallestIndex].priority) {
+        smallestIndex = rightChildIndex;
+      }
+
+      // If the smallest is still the current index, the heap is valid
+      if (smallestIndex === currentIndex) break;
+
+      // Swap and continue
+      this.swap(currentIndex, smallestIndex);
+      currentIndex = smallestIndex;
+    }
+  }
+
+  // Peek at the highest-priority task without removing it
+  peek() {
+    return this.heap.length > 0 ? this.heap[0] : null;
+  }
+
+  // Check if the heap is empty
+  isEmpty() {
+    return this.heap.length === 0;
+  }
+}
+
+// Task Scheduler Class
+class TaskScheduler {
+  constructor() {
+    this.taskQueue = new MinHeap();
+  }
+
+  // Add a new task with a priority
+  addTask(priority, taskDetails) {
+    this.taskQueue.insert({ priority, taskDetails });
+  }
+
+  // Get and execute the highest-priority task
+  runNextTask() {
+    if (this.taskQueue.isEmpty()) {
+      console.log("No tasks to run.");
+      return;
+    }
+    const nextTask = this.taskQueue.pop();
+    console.log(`Running task: ${nextTask.taskDetails} with priority ${nextTask.priority}`);
+    return nextTask;
+  }
+}
+
+// Example usage:
+const scheduler = new TaskScheduler();
+
+// Add some tasks with different priorities (lower number = higher priority)
+scheduler.addTask(5, "Low-priority task");
+scheduler.addTask(1, "High-priority task");
+scheduler.addTask(3, "Medium-priority task");
+
+// Run tasks in order of priority
+scheduler.runNextTask();  // Output: Running task: High-priority task with priority 1
+scheduler.runNextTask();  // Output: Running task: Medium-priority task with priority 3
+scheduler.runNextTask();  // Output: Running task: Low-priority task with priority 5
+
+```
+
+Explanation of the Code:
+MinHeap Class:
+insert(): Adds a new task to the heap while maintaining the heap property (i.e., the smallest priority task is always at the root).
+heapifyUp(): Moves the newly inserted task up the tree to restore the heap property.
+pop(): Removes and returns the task with the highest priority (smallest value) from the heap, then restructures the heap using heapifyDown() to maintain the heap property.
+peek(): Returns the highest-priority task without removing it.
+TaskScheduler Class:
+addTask(): Adds a new task to the scheduler with a specified priority.
+runNextTask(): Executes the task with the highest priority by removing it from the heap.
+Benefits of Using a Heap for Priority-Based Task Scheduling:
+Efficient Priority Handling: Heaps allow the scheduler to quickly determine and remove the highest-priority task (O(1) for retrieval, O(log N) for removal).
+
+Dynamic Task Management: New tasks can be added at any time, and the heap efficiently inserts them while maintaining the correct priority order (O(log N) insertion).
+
+Optimized Resource Use: By always executing the most important task first, you optimize resource use in the app, particularly important for mobile devices with limited processing power and battery life.
+
+Scalability: Heaps are highly scalable for task scheduling, especially for large numbers of dynamic tasks, making them suitable for mobile apps that need to handle multiple background operations, downloads, notifications, etc.
+
+Conclusion:
+Using a heap to implement a priority-based task scheduler in a mobile app allows for efficient management of dynamic tasks by always executing tasks in the correct priority order. The heap ensures that the highest-priority task can be accessed in constant time and that tasks can be dynamically inserted and removed in logarithmic time. This makes it well-suited for managing background processes, notifications, or any other tasks that require prioritization in mobile applications.
+
+---
+
+### 6. Describe how you would use graph algorithms to implement features like finding nearby users or locations.
+
+To implement features like finding nearby users or locations in a mobile app, graph algorithms can be leveraged for efficient proximity-based searches. Let’s go through an example using the Dijkstra's Algorithm to find the nearest locations based on geographical distances.
+
+Problem Statement
+In a mobile app, we want to allow users to search for nearby locations (e.g., restaurants, stores) based on their current geographical location. We'll use Dijkstra's Algorithm to find the shortest paths from the user's location to other locations in the area.
+
+Step-by-Step Approach
+Modeling the Problem as a Graph:
+
+Nodes: Represent locations (users, places, etc.).
+Edges: Represent the distance between locations. Each edge has a weight, which is the geographical distance between two locations.
+Dijkstra’s Algorithm:
+
+Finds the shortest path from the user’s current location to all other locations.
+Returns the closest locations in terms of distance.
+Example Implementation in JavaScript:
+We’ll represent the graph as an adjacency list, where each node (location) has a list of neighboring locations with their distances. Then, we’ll apply Dijkstra's Algorithm to find the closest locations from the user's current position.
+
+```js
+class PriorityQueue {
+  constructor() {
+    this.collection = [];
+  }
+
+  enqueue(element) {
+    if (this.isEmpty()) {
+      this.collection.push(element);
+    } else {
+      let added = false;
+      for (let i = 0; i < this.collection.length; i++) {
+        if (element[1] < this.collection[i][1]) {  // Compare based on distance
+          this.collection.splice(i, 0, element);
+          added = true;
+          break;
+        }
+      }
+      if (!added) {
+        this.collection.push(element);
+      }
+    }
+  }
+
+  dequeue() {
+    return this.collection.shift();  // Removes the first element
+  }
+
+  isEmpty() {
+    return this.collection.length === 0;
+  }
+}
+
+class Graph {
+  constructor() {
+    this.nodes = {};
+  }
+
+  addNode(location) {
+    this.nodes[location] = [];
+  }
+
+  addEdge(location1, location2, distance) {
+    this.nodes[location1].push({ node: location2, weight: distance });
+    this.nodes[location2].push({ node: location1, weight: distance });  // Bidirectional graph
+  }
+
+  // Dijkstra's Algorithm to find the shortest path from the source to all other locations
+  findNearestLocations(source) {
+    let distances = {};
+    let prev = {};
+    let pq = new PriorityQueue();
+
+    // Initialize distances and priority queue
+    Object.keys(this.nodes).forEach((location) => {
+      distances[location] = Infinity;
+      prev[location] = null;
+    });
+    distances[source] = 0;
+    pq.enqueue([source, 0]);
+
+    while (!pq.isEmpty()) {
+      let [currentNode, currentDistance] = pq.dequeue();
+
+      this.nodes[currentNode].forEach(neighbor => {
+        let alt = currentDistance + neighbor.weight;
+        if (alt < distances[neighbor.node]) {
+          distances[neighbor.node] = alt;
+          prev[neighbor.node] = currentNode;
+          pq.enqueue([neighbor.node, alt]);
+        }
+      });
+    }
+
+    return distances;  // Return distances to all locations from the source
+  }
+}
+
+// Example usage:
+
+// Create a graph representing locations and distances between them
+const map = new Graph();
+
+// Add nodes (locations)
+map.addNode("User Location");
+map.addNode("Restaurant A");
+map.addNode("Restaurant B");
+map.addNode("Store C");
+map.addNode("Cafe D");
+
+// Add edges (distances between locations)
+map.addEdge("User Location", "Restaurant A", 2);
+map.addEdge("User Location", "Restaurant B", 4);
+map.addEdge("Restaurant A", "Cafe D", 1);
+map.addEdge("Restaurant B", "Cafe D", 3);
+map.addEdge("Cafe D", "Store C", 2);
+
+// Find the nearest locations from the user's current location
+const userLocation = "User Location";
+const nearestLocations = map.findNearestLocations(userLocation);
+
+// Display the nearest locations and their distances
+console.log("Distances from the user's location:");
+Object.keys(nearestLocations).forEach(location => {
+  console.log(`${location}: ${nearestLocations[location]} units away`);
+});
+
+```
+Explanation of the Code:
+Graph Class:
+
+The graph is represented as an adjacency list, where each node (location) stores its neighboring nodes and the corresponding distances.
+The addNode() method adds a location as a node in the graph.
+The addEdge() method adds an edge (distance) between two locations. For simplicity, we consider the graph to be bidirectional (i.e., the distance from location A to B is the same as from B to A).
+Dijkstra’s Algorithm (findNearestLocations()):
+
+We maintain a priority queue (implemented as a sorted array) to process locations in order of their distance from the source (the user's current location).
+For each location, we calculate the distance to all of its neighbors and update their distance if we find a shorter path.
+The algorithm returns an object containing the shortest distance from the source to all other locations.
+Priority Queue:
+
+The priority queue helps process the nodes with the smallest known distance first.
+This ensures that the algorithm always explores the most promising paths (i.e., the shortest ones) first.
+Example Scenario:
+Let’s say we have the following locations:
+
+User Location (source)
+Restaurant A (2 units from the user)
+Restaurant B (4 units from the user)
+Cafe D (connected to Restaurant A and Restaurant B)
+Store C (connected to Cafe D)
+When running Dijkstra's Algorithm, the app can determine which locations are closest to the user based on distance.
+
+Distances from the user's location:
+User Location: 0 units away
+Restaurant A: 2 units away
+Restaurant B: 4 units away
+Store C: 5 units away
+Cafe D: 3 units away
+
+---
+
+
 
 
 
